@@ -13,7 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 public class TaskFiveTests {
-    static final Logger logger = LoggerFactory.getLogger(TaskFiveTests.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskFiveTests.class);
 
     @Autowired
     private KafkaProducer kafkaProducer;
@@ -27,25 +27,34 @@ public class TaskFiveTests {
     @Autowired
     private BalanceQuerier balanceQuerier;
 
-
     @Test
     void task_five_verifier() throws InterruptedException {
+        // Populate users
         userPopulator.populate();
+
+        // Load transaction lines from file and send them via Kafka
         String[] transactionLines = fileLoader.loadStrings("/test_data/rueiwoqp.tyruei");
         for (String transactionLine : transactionLines) {
             kafkaProducer.send(transactionLine);
         }
+
+        // Wait to ensure all transactions processed
         Thread.sleep(2000);
 
         logger.info("----------------------------------------------------------");
         logger.info("----------------------------------------------------------");
         logger.info("----------------------------------------------------------");
         logger.info("submit the following output to complete the task (include begin and end output denotations)");
-        StringBuilder output = new StringBuilder("\n").append("---begin output ---").append("\n");
+
+        StringBuilder output = new StringBuilder();
+        output.append("\n---begin output ---\n");
+
+        // Query balances for user IDs 0 through 12 inclusively
         for (int i = 0; i < 13; i++) {
             Balance balance = balanceQuerier.query((long) i);
             output.append(balance.toString()).append("\n");
         }
+
         output.append("---end output ---");
         logger.info(output.toString());
     }

@@ -1,46 +1,52 @@
 package com.jpmc.midascore.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class UserRecord {
 
     @Id
-    @GeneratedValue()
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    private String username;
+    private double balance;
 
-    @Column(nullable = false)
-    private float balance;
-
-    protected UserRecord() {
+    // Empty constructor for the database
+    public UserRecord() {
     }
 
-    public UserRecord(String name, float balance) {
-        this.name = name;
+    // Constructor used by the UserPopulator in the test
+    public UserRecord(String username, double balance) {
+        this.username = username;
         this.balance = balance;
     }
 
-    @Override
-    public String toString() {
-        return String.format("User[id=%d, name='%s', balance='%f'", id, name, balance);
-    }
-
+    // Getters and Setters
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public float getBalance() {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(float balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 }
